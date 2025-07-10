@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DAFTAR REGISTRASI PESERTA MPLS SKAWAN 2025</title>
+    <style>
+        /* Gaya dasar untuk semua ukuran layar */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #4a4a4a;
+            margin-bottom: 20px;
+        }
+        .search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        #searchInput {
+            flex-grow: 1;
+            padding: 10px 15px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        #searchButton {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #searchButton:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        thead th {
+            background-color: #007BFF;
+            color: white;
+            font-weight: bold;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        table:has(tbody:empty) {
+            display: none;
+        }
+
+        /* --- CSS RESPONSIVE UNTUK MOBILE --- */
+        /* Terapkan gaya ini jika lebar layar 768px atau kurang */
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 1.5em; /* Perkecil ukuran judul */
+            }
+            .search-container {
+                flex-direction: column; /* Susun kotak pencarian ke bawah */
+            }
+
+            /* Ubah tampilan tabel agar lebih mudah dibaca di HP */
+            table {
+                border: 0;
+            }
+            thead {
+                display: none; /* Sembunyikan header tabel */
+            }
+            tr {
+                display: block; /* Buat setiap baris menjadi seperti kartu */
+                margin-bottom: 15px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            }
+            td {
+                display: block; /* Susun sel ke bawah */
+                text-align: right; /* Ratakan teks data ke kanan */
+                padding-left: 50%; /* Beri ruang di kiri untuk label */
+                position: relative;
+                border-bottom: 1px solid #eee;
+            }
+            td:last-child {
+                border-bottom: 0;
+            }
+            td::before {
+                /* Tambahkan label (Nama, NISN, dll) di sebelah kiri */
+                content: attr(data-label);
+                position: absolute;
+                left: 15px;
+                font-weight: bold;
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>DAFTAR REGISTRASI PESERTA MPLS SKAWAN 2025</h1>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Ketik nama peserta untuk mencari...">
+            <button id="searchButton">Cari</button>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nama</th>
+                    <th>NISN</th>
+                    <th>No. Reg</th>
+                </tr>
+            </thead>
+            <tbody id="data-peserta">
+                </tbody>
+        </table>
+    </div>
+
+    <script>
+        let allParticipants = [];
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+        const tableBody = document.getElementById('data-peserta');
+
+        async function loadData() {
+            try {
+                const response = await fetch('data.json');
+                allParticipants = await response.json();
+            } catch (error) {
+                console.error('Gagal memuat data:', error);
+                alert('Gagal memuat data. Pastikan file data.json ada dan formatnya benar.');
+            }
+        }
+
+        function performSearch() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            tableBody.innerHTML = '';
+
+            if (searchTerm.length === 0) return;
+
+            const filteredData = allParticipants.filter(peserta => 
+                peserta.Nama.toLowerCase().includes(searchTerm)
+            );
+
+            filteredData.forEach(peserta => {
+                const row = document.createElement('tr');
+                /* --- PERUBAHAN DI SINI --- */
+                // Menambahkan atribut 'data-label' untuk setiap sel (td)
+                // Atribut ini digunakan oleh CSS untuk tampilan mobile
+                row.innerHTML = `
+                    <td data-label="Nama">${peserta.Nama}</td>
+                    <td data-label="NISN">${peserta.NISN}</td>
+                    <td data-label="No. Reg">${peserta.Reg}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        searchButton.addEventListener('click', performSearch);
+        searchInput.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') performSearch();
+        });
+        searchInput.addEventListener('input', performSearch);
+
+        document.addEventListener('DOMContentLoaded', loadData);
+    </script>
+
+</body>
+</html>
